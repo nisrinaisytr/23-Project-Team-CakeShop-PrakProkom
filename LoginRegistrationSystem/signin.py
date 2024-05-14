@@ -1,6 +1,7 @@
 from tkinter import * 
 from tkinter import messagebox
 import os
+from PIL import Image, ImageTk
 
 root=Tk()
 root.title('Login')
@@ -12,13 +13,18 @@ def signin():
     username=user.get()
     password=code.get()
 
-img_path = PhotoImage(file='LoginRegistrationSystem\login.png')
+img_path = 'D:/KULIAH/SEMESTER 2/PROJECT PROKOM/TUBES/LoginRegistrationSystem/login.png'
 
+# Load and resize the image using Pillow
 if not os.path.exists(img_path):
     messagebox.showerror("Error", "Image file not found")
 else:
-    img = PhotoImage(file=img_path)
-    Label(root, image=img, bg='white').place(x=50, y=50)
+    img = Image.open(img_path)
+    img = img.resize((560, 360), Image.LANCZOS)  # Resize the image to fit the window
+    img = ImageTk.PhotoImage(img)
+    label_img = Label(root, image=img, border=0, bg='white')
+    label_img.image = img  # Keep a reference to avoid garbage collection
+    label_img.place(x=-10, y=50) # To change position based on X & Y coordinates
 
 frame=Frame(root,width=350,height=350,bg='white')
 frame.place(x=480,y=70)
