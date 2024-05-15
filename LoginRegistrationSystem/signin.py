@@ -4,7 +4,7 @@ import os
 from PIL import Image, ImageTk
 
 root=Tk()
-root.title('Login')
+root.title('SignIn')
 root.geometry('925x500+300+200')
 root.configure(bg="#fff")
 root.resizable(False,False)
