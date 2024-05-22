@@ -3,12 +3,18 @@ from tkinter import messagebox
 import ast
 from PIL import Image, ImageTk
 import os
+import csv
+import subprocess
 
 window = Tk()
 window.title("Sign Up")
 window.geometry('925x500+300+200')
 window.configure(bg='#fff')
 window.resizable(False, False)
+
+def open_signin_window():
+    window.destroy()
+    os.system('python LoginRegistrationSystem/SignIn.py')
 
 def signup():
     username = user.get()
@@ -17,28 +23,48 @@ def signup():
 
     if password == confirm_password:
         try:
-            with open('datasheet.txt', 'r+') as file:
-                d = file.read()
-                r = ast.literal_eval(d)
+            # Check if CSV file exists
+            file_exists = os.path.exists('datasheet.csv')
+            print(f"File exists: {file_exists}")
 
-                dict2 = {username: password}
-                r.update(dict2)
-                file.seek(0)
-                file.write(str(r))
-                file.truncate()
+            # Open the CSV file in append mode
+            with open('datasheet.csv', 'a+', newline='') as file:
+                writer = csv.writer(file)
+                
+                # If the file does not exist, write the header
+                if not file_exists:
+                    writer.writerow(['Username', 'Password'])
+                    print("Header written to file")
+
+                file.seek(0)  # Move cursor to the beginning of the file
+                reader = csv.reader(file)
+                next(reader, None)  # Skip the header row if it exists
+                for row in reader:
+                    if row and row[0] == username:
+                        messagebox.showerror('Error', 'Username already exists')
+                        return
+
+            # Append the new user data
+            with open('datasheet.csv', 'a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([username, password])
+                print(f"New user {username} written to file")
 
             messagebox.showinfo('Sign up', 'Successfully signed up')
 
-        except FileNotFoundError:
-            with open('datasheet.txt', 'w') as file:
-                pp = str({username: password})
-                file.write(pp)
-
-            messagebox.showinfo('Sign up', 'Successfully signed up')
+            # Open the sign-in window
+            open_signin_window()
+            
+        except Exception as e:
+            messagebox.showerror('Error', f"An error occurred: {e}")
+            print(f"Error: {e}")
     else:
         messagebox.showerror('Invalid', "Passwords must match")
+        print("Passwords do not match")
 
-img_path = 'D:/KULIAH/SEMESTER 2/PROJECT PROKOM/TUBES/LoginRegistrationSystem/login.png'
+
+
+img_path = os.path.join('LoginRegistrationSystem', 'images', 'login.png')
 
 # Load and resize the image using Pillow
 if not os.path.exists(img_path):
@@ -98,7 +124,7 @@ Button(frame, width=39, pady=7, text='Sign up', bg='#57a1f8', fg='white', border
 label = Label(frame, text='Already have an account?', fg='black', bg='white', font=('Microsoft YaHei UI Light', 9))
 label.place(x=70, y=340)
 
-signin = Button(frame, width=6, text="Sign in", border=0, bg='white', cursor='hand2', fg='#57a1f8')
+signin = Button(frame, width=6, text="Sign in", border=0, bg='white', cursor='hand2', fg='#57a1f8', command=open_signin_window)
 signin.place(x=215, y=341)
 
 window.mainloop()
