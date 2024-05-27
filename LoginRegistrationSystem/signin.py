@@ -16,6 +16,7 @@ def open_signup_window():
 
 
 def signin():
+    from SignUp_Test import signup
     username = user.get()
     password = code.get()
     path = os.getcwd() + '\\datasheet.csv'
@@ -35,7 +36,7 @@ def signin():
     else:
         messagebox.showerror("Error", "Invalid username or password")
 
-img_path = os.path.join('23-Project-Team-CakeShop-PrakProkom','LoginRegistrationSystem', 'images', 'logo.png')
+img_path = os.path.join('23-Project-Team-CakeShop-PrakProkom', 'images', 'logo.png')
 
 # Load and resize the image using Pillow
 if not os.path.exists(img_path):
