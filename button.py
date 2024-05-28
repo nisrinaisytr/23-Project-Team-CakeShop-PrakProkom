@@ -22,13 +22,19 @@ def balik_ke_home(app):
     homepage.main()
 
 def menuju_ke_cakes(app):
-    from cakes import buat_cakes_page
-    buat_cakes_page(app)
+    for widget in app.winfo_children():
+        widget.destroy()
+    import cakes
+    cakes.buat_cakes_page(app)
 
 def menuju_ke_donuts(app):
-    from donuts import buat_donuts_page
-    buat_donuts_page(app)
+    for widget in app.winfo_children():
+        widget.destroy()
+    import donuts
+    donuts.buat_donuts_page(app)
 
 def menuju_ke_pastry(app):
-    from pastry import buat_pastry_page
-    buat_pastry_page(app)
+    for widget in app.winfo_children():
+        widget.destroy()
+    import pastry
+    pastry.buat_pastry_page(app)
