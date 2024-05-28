@@ -63,7 +63,8 @@ def display_menu(csv_file):
         image = image.resize((150, 150), Image.Resampling.LANCZOS)
         img = ImageTk.PhotoImage(image)
 
-        img_label = ctk.CTkLabel(product_card, image=img)
+        img_label = ctk.CTkLabel(product_card, image=img, text="")
+        img_label.image = img  # Simpan referensi gambar
         img_label.pack()
 
         button = ctk.CTkButton(product_card, text=f"Rp {product['price']}", command=lambda p=product: select_product(p), fg_color=button_color)
@@ -72,7 +73,7 @@ def display_menu(csv_file):
 # Fungsi main untuk memanggil display_menu() saat modul ini dieksekusi
 def main():
     global root, selected_products, total_cost, selected_count_label, total_cost_label
-# Membuat jendela utama aplikasi
+    # Membuat jendela utama aplikasi
     root = ctk.CTk()
     root.title("Cakeshop - Breads")
     root.geometry("900x500")
@@ -87,7 +88,7 @@ def main():
     back_button = ctk.CTkButton(header_frame, text="Back", command=go_back, fg_color=button_color)
     back_button.pack(side=tk.LEFT, padx=10, pady=10)
 
-    title_label = ctk.CTkLabel(header_frame, text="BREADS",justify="center", font=font_title)
+    title_label = ctk.CTkLabel(header_frame, text="BREADS", justify="center", font=font_title)
     title_label.pack(side=tk.TOP, pady=15)
 
     # Menampilkan menu produk dari database/breads.csv
@@ -107,16 +108,17 @@ def main():
     action_frame = ctk.CTkFrame(bottom_frame)
     action_frame.pack(pady=10)
 
-    takeaway_button = ctk.CTkButton(action_frame, text="TAKEAWAY",fg_color=button_color, command=lambda: messagebox.showinfo("Takeaway", "Takeaway option selected"))
+    takeaway_button = ctk.CTkButton(action_frame, text="TAKEAWAY", fg_color=button_color, command=lambda: messagebox.showinfo("Takeaway", "Takeaway option selected"))
     takeaway_button.grid(row=0, column=0, padx=5)
 
-    delivery_button = ctk.CTkButton(action_frame, text="DELIVERY",fg_color=button_color, command=lambda: messagebox.showinfo("Delivery", "Delivery option selected"))
+    delivery_button = ctk.CTkButton(action_frame, text="DELIVERY", fg_color=button_color, command=lambda: messagebox.showinfo("Delivery", "Delivery option selected"))
     delivery_button.grid(row=0, column=1, padx=5)
 
-    dinein_button = ctk.CTkButton(action_frame, text="DINE IN",fg_color=button_color, command=lambda: messagebox.showinfo("Dine In", "Dine In option selected"))
+    dinein_button = ctk.CTkButton(action_frame, text="DINE IN", fg_color=button_color, command=lambda: messagebox.showinfo("Dine In", "Dine In option selected"))
     dinein_button.grid(row=0, column=2, padx=5)
 
     root.mainloop()
+
 # Panggil fungsi main jika modul ini dieksekusi secara langsung
 if __name__ == "__main__":
     main()

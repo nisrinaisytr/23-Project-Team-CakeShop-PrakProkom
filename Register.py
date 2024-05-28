@@ -1,118 +1,148 @@
-import customtkinter as ctk
-import tkinter as tk
+from tkinter import *
 from tkinter import messagebox
-import csv
-from PIL import Image, ImageTk
 import os
-def buat_breads_page():
-    for widget in app.winfo_children():
-        widget.destroy()
-    # Warna dan Font
-    bg_color = "#FFEFE8"
-    text_color = "#FF7A8A"
-    button_color = "#FFADA1"
-    menu_color = "#FFD9CC"
-    font_title = ("Arial", 30, "bold")
-    font_subtitle = ("Arial", 20, "bold")
-    font_text = ("Arial", 12)
+import csv
+import subprocess
+from PIL import Image, ImageTk
 
-    # Fungsi untuk memuat produk dari file CSV
-    def load_products(file_path):
-        products = []
-        with open(file_path, mode='r') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                products.append({
-                    'name': row['name'],
-                    'image': os.path.join('images', row['image']),  # Sesuaikan jalur gambar
-                    'price': int(row['price'])
-                })
-        return products
+database_path = os.path.join(os.getcwd(), 'database', 'akun.csv')
 
-    # Fungsi untuk memilih produk dan memperbarui jumlah dan total harga
-    def select_product(product):
-        global selected_products, total_cost
-        selected_products.append(product)
-        total_cost += product['price']
-        update_display()
+def open_signup_window():
+    root.destroy()
+    main('signup')
 
-    # Fungsi untuk memperbarui tampilan jumlah produk yang dipilih dan total harga
-    def update_display():
-        global selected_count_label, total_cost_label
-        selected_count_label.configure(text=f"Jumlah produk yang dipilih: {len(selected_products)}")
-        total_cost_label.configure(text=f"Rp {total_cost}")
+def open_signin_window():
+    root.destroy()
+    main('signin')
 
-    # Fungsi untuk kembali ke halaman utama
-    def go_back():
-        root.destroy()
-        os.system('python homepage.py')
+def open_homepage():
+    root.destroy()  # Menutup jendela login
+    subprocess.Popen(['python', 'homepage.py'])  # Membuka homepage
 
-    # Fungsi untuk menampilkan menu produk
-    def display_menu(csv_file):
-        products = load_products(os.path.join('database', csv_file))
-        
-        product_frame = ctk.CTkFrame(root)
-        product_frame.pack(pady=18, padx=12, expand=True, fill=tk.BOTH)
-        
-        for index, product in enumerate(products):
-            row = index // 5
-            column = index % 5
+def signup():
+    username = user.get()
+    password = code.get()
+    confirm_password = confirm_code.get()
 
-            product_card = ctk.CTkFrame(product_frame)
-            product_card.grid(row=row, column=column, padx=18, pady=12)
+    if password == confirm_password:
+        try:
+            file_exists = os.path.exists(database_path)
 
-            image = Image.open(product['image'])
-            image = image.resize((150, 150), Image.Resampling.LANCZOS)
-            img = ImageTk.PhotoImage(image)
+            with open(database_path, 'a+', newline='') as file:
+                writer = csv.writer(file)
+                
+                if not file_exists:
+                    writer.writerow(['Username', 'Password'])
 
-            img_label = ctk.CTkLabel(product_card, image=img)
-            img_label.pack()
+                file.seek(0)
+                reader = csv.reader(file)
+                next(reader, None)
+                for row in reader:
+                    if row and row[0] == username:
+                        messagebox.showerror('Error', 'Username already exists')
+                        return
 
-            button = ctk.CTkButton(product_card, text=f"Rp {product['price']}", command=lambda p=product: select_product(p), fg_color=button_color)
-            button.pack()
+            with open(database_path, 'a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([username, password])
 
-    # Membuat jendela utama aplikasi
-    root = ctk.CTk()
-    root.title("Cakeshop - Breads")
-    root.geometry("900x500")
+            messagebox.showinfo('Sign up', 'Successfully signed up')
+            open_signin_window()
+        except Exception as e:
+            messagebox.showerror('Error', f"An error occurred: {e}")
+    else:
+        messagebox.showerror('Invalid', "Passwords must match")
 
-    selected_products = []
-    total_cost = 0
+def signin():
+    username = user.get()
+    password = code.get()
+    
+    try:
+        with open(database_path, newline='') as file:
+            reader = csv.reader(file)
+            credentials = {rows[0]: rows[1] for rows in reader}
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to read data file: {e}")
+        return
+    
+    if username in credentials and credentials[username] == password:
+        messagebox.showinfo("Success", "Login successful!")
+        open_homepage()  # Buka homepage setelah login berhasil
+    else:
+        messagebox.showerror("Error", "Invalid username or password")
 
-    # Frame untuk header (judul dan tombol back)
-    header_frame = ctk.CTkFrame(root)
-    header_frame.pack(fill=tk.X)
+def on_enter(e, widget, placeholder):
+    if widget.get() == placeholder:
+        widget.delete(0, 'end')
+        if widget == code or widget == confirm_code:
+            widget.config(show='*')
 
-    back_button = ctk.CTkButton(header_frame, text="Back", command=go_back, fg_color=button_color)
-    back_button.pack(side=tk.LEFT, padx=10, pady=10)
+def on_leave(e, widget, placeholder):
+    if widget.get() == '':
+        widget.insert(0, placeholder)
+        if widget == code or widget == confirm_code:
+            widget.config(show='')
 
-    title_label = ctk.CTkLabel(header_frame, text="BREADS",justify="center", font=font_title)
-    title_label.pack(side=tk.TOP, pady=15)
+def main(action):
+    global root, user, code, confirm_code
+    root = Tk()
+    root.title('SignIn' if action == 'signin' else 'Sign Up')
+    root.geometry('925x500+300+200')
+    root.configure(bg="#FFDED9")
+    root.resizable(False,False)
 
-    # Menampilkan menu produk dari database/breads.csv
-    display_menu('breads.csv')
+    img_path = os.path.join( 'images', 'logo.png')
+    if not os.path.exists(img_path):
+        messagebox.showerror("Error", "Image file not found")
+    else:
+        img = Image.open(img_path)
+        img = img.resize((360, 360), Image.LANCZOS)
+        img = ImageTk.PhotoImage(img)
+        label_img = Label(root, image=img, border=0, bg='#FFDED9')
+        label_img.image = img
+        label_img.place(x=60, y=50)
 
-    # Membuat frame bawah untuk total dan tombol aksi
-    bottom_frame = ctk.CTkFrame(root)
-    bottom_frame.pack(fill=tk.X, side=tk.BOTTOM, pady=10)
+    frame = Frame(root, width=560, height=360, bg='#FFDED9') if action == 'signup' else Frame(root, width=350, height=350, bg='#FFDED9')
+    frame.place(x=480, y=50 if action == 'signup' else 70)
 
-    selected_count_label = ctk.CTkLabel(bottom_frame, text="Jumlah produk yang dipilih: 0")
-    selected_count_label.pack(side=tk.LEFT, padx=20)
+    heading = Label(frame, text='Sign Up' if action == 'signup' else 'Sign in', fg='#F16A6A', bg='#FFDED9', font=('Microsoft YaHei UI Light', 23, 'bold'))
+    heading.place(x=100 if action == 'signup' else 100, y=5)
 
-    total_cost_label = ctk.CTkLabel(bottom_frame, text="Rp 0")
-    total_cost_label.pack(side=tk.RIGHT, padx=20)
+    user = Entry(frame, width=25 if action == 'signup' else 36, fg='black', border=0, bg='#FFDED9', font=('Microsoft YaHei UI Light', 11))
+    user.place(x=30, y=80)
+    user.insert(0, 'Username')
+    user.bind("<FocusIn>", lambda e: on_enter(e, user, 'Username'))
+    user.bind("<FocusOut>", lambda e: on_leave(e, user, 'Username'))
+    Frame(frame, width=295, height=2, bg='black').place(x=25, y=107)
 
-    # Tombol aksi
-    action_frame = ctk.CTkFrame(bottom_frame)
-    action_frame.pack(pady=10)
+    code = Entry(frame, width=25 if action == 'signup' else 36, fg='black', border=0, bg='#FFDED9', font=('Microsoft YaHei UI Light', 11))
+    code.place(x=30, y=150)
+    code.insert(0, 'Password')
+    code.bind("<FocusIn>", lambda e: on_enter(e, code, 'Password'))
+    code.bind("<FocusOut>", lambda e: on_leave(e, code, 'Password'))
+    Frame(frame, width=295, height=2, bg='black').place(x=25, y=177)
 
-    takeaway_button = ctk.CTkButton(action_frame, text="TAKEAWAY",fg_color=button_color, command=lambda: messagebox.showinfo("Takeaway", "Takeaway option selected"))
-    takeaway_button.grid(row=0, column=0, padx=5)
+    if action == 'signup':
+        confirm_code = Entry(frame, width=25, fg='black', border=0, bg='#FFDED9', font=('Microsoft YaHei UI Light', 11))
+        confirm_code.place(x=30, y=220)
+        confirm_code.insert(0, 'Confirm Password')
+        confirm_code.bind("<FocusIn>", lambda e: on_enter(e, confirm_code, 'Confirm Password'))
+        confirm_code.bind("<FocusOut>", lambda e: on_leave(e, confirm_code, 'Confirm Password'))
+        Frame(frame, width=295, height=2, bg='black').place(x=25, y=247)
 
-    delivery_button = ctk.CTkButton(action_frame, text="DELIVERY",fg_color=button_color, command=lambda: messagebox.showinfo("Delivery", "Delivery option selected"))
-    delivery_button.grid(row=0, column=1, padx=5)
-
-    dinein_button = ctk.CTkButton(action_frame, text="DINE IN",fg_color=button_color, command=lambda: messagebox.showinfo("Dine In", "Dine In option selected"))
-    dinein_button.grid(row=0, column=2, padx=5)
+        Button(frame, width=39, pady=7, text='Sign up', bg='#F16A6A', fg='#FFDED9', border=0, command=signup).place(x=35, y=280)
+        label = Label(frame, text='Already have an account?', fg='black', bg='#FFDED9', font=('Microsoft YaHei UI Light', 9))
+        label.place(x=70, y=340)
+        signin_tombol = Button(frame, width=6, text="Sign in", border=0, bg='#FFDED9', cursor='hand2', fg='#57a1f8', command=open_signin_window)
+        signin_tombol.place(x=215, y=341)
+    else:
+        Button(frame, width=39, pady=7, text='Sign in', bg='#F16A6A', fg='#FFDED9', border=0, command=signin).place(x=35, y=204)
+        label = Label(frame, text="Don't have an account?", fg='black', bg='#FFDED9', font=('Microsoft YaHei UI Light', 9))
+        label.place(x=75, y=270)
+        sign_up = Button(frame, width=6, text='Sign up', border=0, bg='#FFDED9', cursor='hand2', fg='#57a1f8', command=open_signup_window)
+        sign_up.place(x=215, y=270)
 
     root.mainloop()
+
+if __name__ == "__main__":
+    main('signin')
