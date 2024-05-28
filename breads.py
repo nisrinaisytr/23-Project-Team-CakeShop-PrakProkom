@@ -12,7 +12,7 @@ bg_color = "#FFEFE8"
 text_color = "#FF7A8A"
 button_color = "#FFADA1"
 menu_color = "#FFD9CC"
-font_title = ("Arial", 30, "bold")
+font_title = ("Baskerville Old Face", 30, "bold")
 font_subtitle = ("Arial", 20, "bold")
 font_text = ("Arial", 12)
 
