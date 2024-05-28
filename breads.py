@@ -1,11 +1,13 @@
+# breads.py
+
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import messagebox
 import csv
 from PIL import Image, ImageTk
 import os
+import button  # Import button module for navigation to pemilihan
 
-# Warna dan Font
 bg_color = "#FFEFE8"
 text_color = "#FF7A8A"
 button_color = "#FFADA1"
@@ -14,111 +16,98 @@ font_title = ("Arial", 30, "bold")
 font_subtitle = ("Arial", 20, "bold")
 font_text = ("Arial", 12)
 
-# Fungsi untuk memuat produk dari file CSV
-def load_products(file_path):
-    products = []
-    with open(file_path, mode='r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            products.append({
-                'name': row['name'],
-                'image': os.path.join('images', row['image']),  # Sesuaikan jalur gambar
-                'price': int(row['price'])
-            })
-    return products
+selected_count_label = None
+total_cost_label = None
+selected_products = []
+total_cost = 0
 
-# Fungsi untuk memilih produk dan memperbarui jumlah dan total harga
-def select_product(product):
-    global selected_products, total_cost
-    selected_products.append(product)
-    total_cost += product['price']
-    update_display()
-
-# Fungsi untuk memperbarui tampilan jumlah produk yang dipilih dan total harga
 def update_display():
     global selected_count_label, total_cost_label
     selected_count_label.configure(text=f"Jumlah produk yang dipilih: {len(selected_products)}")
     total_cost_label.configure(text=f"Rp {total_cost}")
 
-# Fungsi untuk kembali ke halaman utama
-def go_back():
-    root.destroy()
-    os.system('python homepage.py')
+def buat_breads_page(app):
+    def load_products(file_path):
+        products = []
+        with open(file_path, mode='r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                products.append({
+                    'name': row['name'],
+                    'image': os.path.join('images', row['image']),
+                    'price': int(row['price'])
+                })
+        return products
 
-# Fungsi untuk menampilkan menu produk
-def display_menu(csv_file):
-    products = load_products(os.path.join('database', csv_file))
-    
-    product_frame = ctk.CTkFrame(root)
-    product_frame.pack(pady=18, padx=12, expand=True, fill=tk.BOTH)
-    
-    for index, product in enumerate(products):
-        row = index // 5
-        column = index % 5
+    def select_product(product):
+        global selected_products, total_cost
+        selected_products.append(product)
+        total_cost += product['price']
+        update_display()
 
-        product_card = ctk.CTkFrame(product_frame)
-        product_card.grid(row=row, column=column, padx=18, pady=12)
+    def go_back():
+        for widget in app.winfo_children():
+            widget.destroy()
+        os.system('python homepage.py')
 
-        image = Image.open(product['image'])
-        image = image.resize((150, 150), Image.Resampling.LANCZOS)
-        img = ImageTk.PhotoImage(image)
+    def display_menu(csv_file):
+        products = load_products(os.path.join('database', csv_file))
+        
+        product_frame = ctk.CTkFrame(app)
+        product_frame.grid(row=1, column=0, columnspan=3, pady=18, padx=12, sticky="nsew")
+        
+        for index, product in enumerate(products):
+            row = index // 5
+            column = index % 5
 
-        img_label = ctk.CTkLabel(product_card, image=img, text="")
-        img_label.image = img  # Simpan referensi gambar
-        img_label.pack()
+            product_card = ctk.CTkFrame(product_frame)
+            product_card.grid(row=row, column=column, padx=18, pady=12)
 
-        button = ctk.CTkButton(product_card, text=f"Rp {product['price']}", command=lambda p=product: select_product(p), fg_color=button_color)
-        button.pack()
+            image = Image.open(product['image'])
+            image = image.resize((150, 150), Image.Resampling.LANCZOS)
+            img = ImageTk.PhotoImage(image)
 
-# Fungsi main untuk memanggil display_menu() saat modul ini dieksekusi
-def main():
-    global root, selected_products, total_cost, selected_count_label, total_cost_label
-    # Membuat jendela utama aplikasi
-    root = ctk.CTk()
-    root.title("Cakeshop - Breads")
-    root.geometry("900x500")
+            img_label = ctk.CTkLabel(product_card, image=img, text="")
+            img_label.image = img
+            img_label.grid(row=0, column=0, pady=(0, 10))
 
-    selected_products = []
-    total_cost = 0
+            button = ctk.CTkButton(product_card, text=f"Rp {product['price']}", command=lambda p=product: select_product(p), fg_color=button_color)
+            button.grid(row=1, column=0)
 
-    # Frame untuk header (judul dan tombol back)
-    header_frame = ctk.CTkFrame(root)
-    header_frame.pack(fill=tk.X)
+    header_frame = ctk.CTkFrame(app)
+    header_frame.grid(row=0, column=0, columnspan=3, sticky="ew")
 
     back_button = ctk.CTkButton(header_frame, text="Back", command=go_back, fg_color=button_color)
-    back_button.pack(side=tk.LEFT, padx=10, pady=10)
+    back_button.grid(row=0, column=0, padx=10, pady=10)
 
     title_label = ctk.CTkLabel(header_frame, text="BREADS", justify="center", font=font_title)
-    title_label.pack(side=tk.TOP, pady=15)
+    title_label.grid(row=0, column=1, pady=15)
 
-    # Menampilkan menu produk dari database/breads.csv
     display_menu('breads.csv')
 
-    # Membuat frame bawah untuk total dan tombol aksi
-    bottom_frame = ctk.CTkFrame(root)
-    bottom_frame.pack(fill=tk.X, side=tk.BOTTOM, pady=10)
+    bottom_frame = ctk.CTkFrame(app)
+    bottom_frame.grid(row=2, column=0, columnspan=3, pady=10, sticky="ew")
 
+    global selected_count_label, total_cost_label
     selected_count_label = ctk.CTkLabel(bottom_frame, text="Jumlah produk yang dipilih: 0")
-    selected_count_label.pack(side=tk.LEFT, padx=20)
+    selected_count_label.grid(row=0, column=0, padx=20, sticky="w")
 
     total_cost_label = ctk.CTkLabel(bottom_frame, text="Rp 0")
-    total_cost_label.pack(side=tk.RIGHT, padx=20)
+    total_cost_label.grid(row=0, column=2, padx=20, sticky="e")
 
-    # Tombol aksi
     action_frame = ctk.CTkFrame(bottom_frame)
-    action_frame.pack(pady=10)
+    action_frame.grid(row=0, column=1, pady=10)
 
-    takeaway_button = ctk.CTkButton(action_frame, text="TAKEAWAY", fg_color=button_color, command=lambda: messagebox.showinfo("Takeaway", "Takeaway option selected"))
-    takeaway_button.grid(row=0, column=0, padx=5)
+    takeaway_button = ctk.CTkButton(action_frame, text="TAKEAWAY", fg_color=button_color, command=lambda: button.menuju_ke_pemilihan(app, "Takeaway", selected_products))
+    takeaway_button.grid(row=0, column=0, padx=5, pady=5)
+    delivery_button = ctk.CTkButton(action_frame, text="DELIVERY", fg_color=button_color, command=lambda: button.menuju_ke_pemilihan(app, "Delivery", selected_products))
+    delivery_button.grid(row=0, column=1, padx=5, pady=5)
+    dinein_button = ctk.CTkButton(action_frame, text="DINE IN", fg_color=button_color, command=lambda: button.menuju_ke_pemilihan(app, "Dine In", selected_products))
+    dinein_button.grid(row=0, column=2, padx=5, pady=5)
 
-    delivery_button = ctk.CTkButton(action_frame, text="DELIVERY", fg_color=button_color, command=lambda: messagebox.showinfo("Delivery", "Delivery option selected"))
-    delivery_button.grid(row=0, column=1, padx=5)
-
-    dinein_button = ctk.CTkButton(action_frame, text="DINE IN", fg_color=button_color, command=lambda: messagebox.showinfo("Dine In", "Dine In option selected"))
-    dinein_button.grid(row=0, column=2, padx=5)
-
-    root.mainloop()
-
-# Panggil fungsi main jika modul ini dieksekusi secara langsung
 if __name__ == "__main__":
-    main()
+    app = ctk.CTk()
+    app.title("Cakeshop - Breads")
+    app.geometry("900x500")
+    buat_breads_page(app)
+    app.mainloop()
