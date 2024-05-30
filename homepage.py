@@ -22,9 +22,21 @@ def main():
         app.destroy()
         subprocess.Popen(['python', 'register.py', 'signin'])
 
+    
+    def delete_cart():
+        try:
+            os.remove('database/cart.csv')
+        except FileNotFoundError:
+            pass
+        app.destroy()
+
     app = ctk.CTk()
     app.geometry("900x600")
     app.title("23Bee Bakery")
+
+    # Bind the clear_cart function to the close event
+    app.protocol("WM_DELETE_WINDOW", delete_cart)
+    # app.protocol("WM_DELETE_WINDOW", app.destroy)
 
     bg_color = "#FFEFE8"
     text_color = "#FF7A8A"
@@ -95,4 +107,6 @@ def main():
     app.mainloop()
 
 if __name__ == "__main__":
+    #import Register
+    #Register.main('action')
     main()

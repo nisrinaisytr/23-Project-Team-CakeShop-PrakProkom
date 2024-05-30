@@ -4,18 +4,22 @@ from tkinter import messagebox
 import random
 import string
 import os
+import receipt
 
 # Function to generate random payment code
 def generate_random_code(length=10):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
+
 def print_invoice(app):
-    # Implement print functionality here
-    # For now, we just simulate print action
     messagebox.showinfo("Print", "Print berhasil dilakukan, selamat menikmati kue anda.")
+
+    ## UNCOMMENT INI KALO MAU CONVERT KE PDF
+    # receipt.print_receipt()
+
     app.destroy()
-    import homepage
-    homepage.main()
+    # import homepage
+    # homepage.main()
 
 def go_back(app):
     app.destroy()
@@ -53,6 +57,9 @@ def buat_invoice_page(app, nama, pilihan, jam, pembayaran):
     print_button = ctk.CTkButton(app, text="PRINT", command=lambda: print_invoice(app), fg_color="#FFADA1")
     print_button.grid(row=2, column=0, columnspan=2, pady=20)
 
+    print(f"Pilihan pada Invoice: {pilihan}")
+    print(f"Pilihan pembayaran anda: {pembayaran}")
+
     # Conditional message based on selection and payment
     if pilihan == "DELIVERY":
         message_line_1 = f"Pesanan anda akan diantar pada pukul {jam}, estimasi pengiriman sekitar 30 menit."
@@ -65,13 +72,13 @@ def buat_invoice_page(app, nama, pilihan, jam, pembayaran):
         if pembayaran == "Tunai":
             message_line_2 = "Silahkan bayar tagihan anda di kasir dengan menunjukkan kode pembayaran anda."
         else:
-            message_line_2 = "Silahkan lakukan pembayaran melalui m-banking dan e-wallet anda dengan kode pembayaran berikut. Waktu maksimal pembayaran adalah 1x24 jam sejak kode diterima."
+            message_line_2 = "Silahkan lakukan pembayaran melalui m-banking dan e-wallet anda dengan kode pembayaran berikut. \nWaktu maksimal pembayaran adalah 1x24 jam sejak kode diterima."
     elif pilihan == "DINE IN":
         message_line_1 = f"Pesanan anda akan siap pada pukul {jam}, silahkan datang ke tempat pada jam tersebut."
         if pembayaran == "Tunai":
             message_line_2 = "Silahkan bayar tagihan anda di kasir dengan menunjukkan kode pembayaran anda."
         else:
-            message_line_2 = "Silahkan lakukan pembayaran melalui m-banking dan e-wallet anda dengan kode pembayaran berikut. Waktu maksimal pembayaran adalah 1x24 jam sejak kode diterima."
+            message_line_2 = "Silahkan lakukan pembayaran melalui m-banking dan e-wallet anda dengan kode pembayaran berikut. \nWaktu maksimal pembayaran adalah 1x24 jam sejak kode diterima."
     
     message_label_1 = ctk.CTkLabel(invoice_frame, text=message_line_1, justify="center", font=("Arial", 16))
     message_label_1.grid(row=3, column=0, columnspan=2, pady=5)
@@ -83,5 +90,5 @@ if __name__ == "__main__":
     app = ctk.CTk()
     app.title("Cakeshop - Invoice")
     # Example usage
-    buat_invoice_page(app, "Nama Pengguna", "DELIVERY", "10:00 AM", "Tunai")
+    buat_invoice_page(app, "Nama Pengguna", "TAKEAWAY", "10:00 AM", "Tunai")
     app.mainloop()

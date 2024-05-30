@@ -6,6 +6,7 @@ from tkinter import messagebox
 import csv
 from PIL import Image, ImageTk
 import os
+import homepage
 import button  # Import button module for navigation to pemilihan
 
 bg_color = "#FFEFE8"
@@ -26,7 +27,47 @@ def update_display():
     selected_count_label.configure(text=f"Jumlah produk yang dipilih: {len(selected_products)}")
     total_cost_label.configure(text=f"Rp {total_cost}")
 
+def load_cart_from_csv():
+    global selected_products, total_cost
+    cart_path = 'database/cart.csv'
+    selected_products = []
+    total_cost = 0
+
+    # Check if cart.csv exists
+    if not os.path.exists(cart_path):
+        # Create the file with a header if it doesn't exist
+        with open(cart_path, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['name', 'price'])
+    
+    # Load cart if it exists and is not empty
+    if os.stat(cart_path).st_size > 0:
+        with open(cart_path, mode='r') as file:
+            reader = csv.reader(file)
+            next(reader)  # Skip header
+            for row in reader:
+                selected_products.append({
+                    'name': row[0],
+                    'price': int(row[1])
+                })
+                total_cost += int(row[1])
+    else:
+        # If cart.csv is empty, set default values
+        selected_products = []
+        total_cost = 0
+
+def save_cart_to_csv():
+    with open('database/cart.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['name', 'price'])  # Write header
+        for product in selected_products:
+            writer.writerow([product['name'], product['price']])
+
 def buat_pastry_page(app):
+
+    load_cart_from_csv()
+    # update_display()
+
     def load_products(file_path):
         products = []
         with open(file_path, mode='r') as file:
@@ -45,12 +86,21 @@ def buat_pastry_page(app):
         total_cost += product['price']
         update_display()
 
+    # def go_back():
+    #     save_cart_to_csv()  # Save cart to CSV before going back
+    #     for widget in app.winfo_children():
+    #         widget.destroy()
+    #     os.system('python homepage.py')
+
     def go_back():
-        for widget in app.winfo_children():
-            widget.destroy()
+        save_cart_to_csv()  # Save cart to CSV before going back
+        app.destroy()
         os.system('python homepage.py')
 
     def display_menu(csv_file):
+
+        load_cart_from_csv()
+
         products = load_products(os.path.join('database', csv_file))
         
         product_frame = ctk.CTkFrame(app)
@@ -64,7 +114,7 @@ def buat_pastry_page(app):
             product_card.grid(row=row, column=column, padx=18, pady=12)
 
             image = Image.open(product['image'])
-            image = image.resize((150, 150), Image.Resampling.LANCZOS)
+            image = image.resize((150, 150), Image.LANCZOS) ## Image.Resampling.LANCZOS
             img = ImageTk.PhotoImage(image)
 
             img_label = ctk.CTkLabel(product_card, image=img, text="")
@@ -98,12 +148,15 @@ def buat_pastry_page(app):
     action_frame = ctk.CTkFrame(bottom_frame)
     action_frame.grid(row=0, column=1, pady=10)
 
-    takeaway_button = ctk.CTkButton(action_frame, text="TAKEAWAY", fg_color=button_color, command=lambda: button.menuju_ke_pemilihan(app, "Takeaway", selected_products))
+    takeaway_button = ctk.CTkButton(action_frame, text="TAKEAWAY", fg_color=button_color, command=lambda: button.menuju_ke_pemilihan(app, "TAKEAWAY", selected_products))
     takeaway_button.grid(row=0, column=0, padx=5, pady=5)
-    delivery_button = ctk.CTkButton(action_frame, text="DELIVERY", fg_color=button_color, command=lambda: button.menuju_ke_pemilihan(app, "Delivery", selected_products))
+    delivery_button = ctk.CTkButton(action_frame, text="DELIVERY", fg_color=button_color, command=lambda: button.menuju_ke_pemilihan(app, "DELIVERY", selected_products))
     delivery_button.grid(row=0, column=1, padx=5, pady=5)
-    dinein_button = ctk.CTkButton(action_frame, text="DINE IN", fg_color=button_color, command=lambda: button.menuju_ke_pemilihan(app, "Dine In", selected_products))
+    dinein_button = ctk.CTkButton(action_frame, text="DINE IN", fg_color=button_color, command=lambda: button.menuju_ke_pemilihan(app, "DINE IN", selected_products))
     dinein_button.grid(row=0, column=2, padx=5, pady=5)
+
+     # Initialize selected_count_label and total_cost_label
+    update_display()
 
 if __name__ == "__main__":
     app = ctk.CTk()

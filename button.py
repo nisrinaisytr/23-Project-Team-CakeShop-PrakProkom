@@ -21,6 +21,12 @@ def balik_ke_home(app):
     import homepage
     homepage.main()
 
+def menuju_ke_register(app):
+    for widget in app.winfo_childern():
+        widget.destroy()
+        import Register
+        Register.main()
+
 def menuju_ke_cakes(app):
     for widget in app.winfo_children():
         widget.destroy()

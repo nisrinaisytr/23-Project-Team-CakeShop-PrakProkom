@@ -30,7 +30,7 @@ def buat_pemilihan_page(app, pilihan, selected_products):
     def confirm_selection():
         nama = name_entry.get()
         no_telp = phone_entry.get()
-        alamat = address_entry.get() if pilihan == "Delivery" else ""
+        alamat = address_entry.get() if pilihan == "DELIVERY" else ""
         jam = time_entry.get()
         print(f"Nama: {nama}, No Telp: {no_telp}, Alamat: {alamat}, Jam: {jam}, Opsi: {pilihan}")
         
@@ -64,11 +64,11 @@ def buat_pemilihan_page(app, pilihan, selected_products):
     ctk.CTkLabel(form_frame, text="NAMA :", font=("Arial", 12)).grid(row=1, column=0, pady=5, sticky="e")
     ctk.CTkLabel(form_frame, text="NO TELP :", font=("Arial", 12)).grid(row=2, column=0, pady=5, sticky="e")
     
-    time_label_text = "JAM KEDATANGAN :" if pilihan == "Dine In" else "JAM PENGANTARAN :" if pilihan == "Delivery" else "JAM PENGAMBILAN :"
+    time_label_text = "JAM KEDATANGAN :" if pilihan == "DINE IN" else "JAM PENGANTARAN :" if pilihan == "DELIVERY" else "JAM PENGAMBILAN :"
     ctk.CTkLabel(form_frame, text=time_label_text, font=("Arial", 12)).grid(row=3, column=0, pady=5, sticky="e")
 
     address_label_text = "ALAMAT :" 
-    if pilihan == "Delivery":
+    if pilihan == "DELIVERY":
         ctk.CTkLabel(form_frame, text=address_label_text, font=("Arial", 12)).grid(row=4, column=0, pady=5, sticky="e")
         address_entry = ctk.CTkEntry(form_frame)
         address_entry.grid(row=4, column=1, pady=5, padx=10)
@@ -95,5 +95,5 @@ if __name__ == "__main__":
         {'name': 'Choco Bun', 'quantity': 1, 'price': 11000},
         {'name': 'Korean Garlic Bread', 'quantity': 1, 'price': 20000},
     ]
-    buat_pemilihan_page(app, "Dine In", sample_products)
+    buat_pemilihan_page(app, "DINE IN", sample_products)
     app.mainloop()
