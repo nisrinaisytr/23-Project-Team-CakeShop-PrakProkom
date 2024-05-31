@@ -83,15 +83,24 @@ def on_leave(e, widget, placeholder):
         if widget == code or widget == confirm_code:
             widget.config(show='')
 
+def toggle_fullscreen(event=None):
+    root.attributes("-fullscreen", not root.attributes("-fullscreen"))
+
+def end_fullscreen(event=None):
+    root.attributes("-fullscreen", False)
+
 def main(action):
     global root, user, code, confirm_code
     root = Tk()
     root.title('SignIn' if action == 'signin' else 'Sign Up')
-    root.geometry('925x500+300+200')
+    root.geometry('1270x710')
     root.configure(bg="#FFDED9")
-    root.resizable(False,False)
+    root.resizable(True, True)  # Pastikan jendela bisa di-resize
 
-    img_path = os.path.join( 'images', 'logo.png')
+    root.bind("<F11>", toggle_fullscreen)
+    root.bind("<Escape>", end_fullscreen)
+
+    img_path = os.path.join('images', 'logo.png')
     if not os.path.exists(img_path):
         messagebox.showerror("Error", "Image file not found")
     else:
@@ -145,7 +154,6 @@ def main(action):
     root.mainloop()
 
 if __name__ == "__main__":
-    #main()
     import sys
     if len(sys.argv) > 1 and sys.argv[1] == 'signin':
         main('signin')

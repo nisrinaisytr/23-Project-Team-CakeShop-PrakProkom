@@ -57,7 +57,7 @@ def main(app):
     bg_label.lower()
 
     image_folder = "images"
-    image_files = ["bakery1.png", "bakery2.png", "bakery3.png"]
+    image_files = ["logohome.png","bakery1.png", "bakery2.png", "bakery3.png", "bakery4.png", "bakery5.png"]
     image_paths = [os.path.join(image_folder, img) for img in image_files]
 
     slider_images = [ImageTk.PhotoImage(Image.open(img_path).resize((600, 400))) for img_path in image_paths]

@@ -2,6 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 from tkinter import messagebox
 import os
+from PIL import Image, ImageTk
 import invoice
 import csv
 
@@ -27,13 +28,13 @@ def display_orders():
         widget.destroy()
 
     for index, product in enumerate(selected_products):
-        product_label = ctk.CTkLabel(orders_frame, text=f"{product['name']} x {product.get('quantity', 1)}")
+        product_label = ctk.CTkLabel(orders_frame,text_color='#C27767', text=f"{product['name']} x {product.get('quantity', 1)}")
         product_label.grid(row=index, column=0, padx=10, pady=5)
 
-        price_label = ctk.CTkLabel(orders_frame, text=f"Rp {product['price'] * product.get('quantity', 1)}")
+        price_label = ctk.CTkLabel(orders_frame,text_color='#C27767', text=f"Rp {product['price'] * product.get('quantity', 1)}")
         price_label.grid(row=index, column=1, padx=10, pady=5)
 
-        remove_button = ctk.CTkButton(orders_frame, text="Remove", command=lambda i=index: remove_product(i), fg_color="#FFADA1")
+        remove_button = ctk.CTkButton(orders_frame,text_color='white', text="Remove", command=lambda i=index: remove_product(i), fg_color="#C27767")
         remove_button.grid(row=index, column=2, padx=10, pady=5)
 
     update_total_cost()
@@ -63,38 +64,58 @@ def buat_pembayaran_page(app, products, pilihan):
     # Clear previous widgets
     for widget in app.winfo_children():
         widget.destroy()
+    img_pathbread = os.path.join('images', 'background.png')
+    imgbread = Image.open(img_pathbread)
+    imgbread = imgbread.resize((2050, 1095), Image.LANCZOS)  # Adjust to fit the window size
+    img1 = ImageTk.PhotoImage(imgbread)
+
+    bg_label = ctk.CTkLabel(app, image=img1, text="")
+    bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+    bg_label.image = img1  # Prevent image from being garbage collected
+    bg_label.lower()
+
+    main_frame = ctk.CTkFrame(app,fg_color='white', width=900, height=600)
+    main_frame.place(relx=0.5, rely=0.5, anchor="center")
+    main_frame.pack_propagate(False)  # Prevent frame from resizing to fit its content
 
     # Header Frame
-    header_frame = ctk.CTkFrame(app)
-    header_frame.grid(row=0, column=0, columnspan=2, sticky="ew")
+    header_frame = ctk.CTkFrame(main_frame, fg_color="#FFF", width=600, height=50)
+    header_frame.place(relx=0.58, rely=0.1, anchor="center")
+    header_frame.pack_propagate(False)  # Prevent frame from resizing to fit its content
 
-    back_button = ctk.CTkButton(header_frame, text="Batal", command=lambda: go_back(app), fg_color="#FFADA1")
-    back_button.grid(row=0, column=0, padx=10, pady=10)
+    from button import balik_ke_home
+    back_button = ctk.CTkButton(app, text="Batal", command=lambda:balik_ke_home(app), fg_color="#FFADA1")
+    back_button.pack(side="top", padx=15, pady=30)
+    back_button.place(rely=0.02,relx=0.01)
+    #back_button.pack_propagate(False) 
 
-    title_label = ctk.CTkLabel(header_frame, text="Total Pesanan Anda", justify="center", font=("Arial", 20, "bold"))
-    title_label.grid(row=0, column=1, pady=15)
+    title_label = ctk.CTkLabel(header_frame, text="TOTAL PESANAN ANDA", justify="center",text_color='#DB7575', font=("Baskerville Old Face", 35, "bold"))
+    title_label.pack(side="left", pady=10, padx=40)
 
     # Orders Frame
     global orders_frame
-    orders_frame = ctk.CTkFrame(app)
-    orders_frame.grid(row=1, column=0, pady=10, padx=10, sticky="nsew")
+    orders_frame = ctk.CTkFrame(main_frame, fg_color="#ffe3de", width=900, height=500)
+    orders_frame.place(relx=0.12, rely=0.18)
+    orders_frame.pack_propagate(False)  # Prevent frame from resizing to fit its content
 
     display_orders()
 
     # Payment Frame
-    payment_frame = ctk.CTkFrame(app)
-    payment_frame.grid(row=1, column=1, pady=10, padx=10, sticky="nsew")
+    payment_frame = ctk.CTkFrame(main_frame, fg_color="#ffe3de", width=750, height=500)
+    payment_frame.place(relx=0.63, rely=0.18)
+    payment_frame.pack_propagate(False)  # Prevent frame from resizing to fit its content
 
-    payment_label = ctk.CTkLabel(payment_frame, text="PEMBAYARAN\nPilih Opsi Pembayaran", justify="center", font=("Arial", 18, "bold"))
-    payment_label.grid(row=0, column=0, pady=10)
+    payment_label = ctk.CTkLabel(payment_frame, text="PEMBAYARAN\nPilih Opsi Pembayaran",text_color='#DB7575', justify="center", font=("Arial", 18, "bold"))
+    payment_label.grid(row=0, column=0, padx=20,pady=20)
 
     payment_var = tk.StringVar(value="Tunai")
 
-    tunai_radio = ctk.CTkRadioButton(payment_frame, text="Tunai", variable=payment_var, value="Tunai")
-    tunai_radio.grid(row=1, column=0, padx=10, pady=5)
+    tunai_radio = ctk.CTkRadioButton(payment_frame, text="Tunai",hover_color='#DB7575',fg_color='#DB7575',text_color= '#DB7575', variable=payment_var, value="Tunai")
+    tunai_radio.grid(row=1, column=0, padx=10, pady=(15,20))
 
-    non_tunai_radio = ctk.CTkRadioButton(payment_frame, text="Non Tunai", variable=payment_var, value="Non Tunai")
-    non_tunai_radio.grid(row=2, column=0, padx=10, pady=5)
+    non_tunai_radio = ctk.CTkRadioButton(payment_frame,hover_color='#DB7575',fg_color='#DB7575', text="Non Tunai",text_color= '#DB7575',variable=payment_var, value="Non Tunai")
+    non_tunai_radio.grid(row=2, column=0, padx=10, pady=(10,50))
+    
 
     def checkout():
         # Read the latest data from datapembeli.csv
@@ -118,11 +139,11 @@ def buat_pembayaran_page(app, products, pilihan):
         invoice.buat_invoice_page(app, nama_pengguna, no_telp, selected_pilihan.upper(), jam_input, metode_pembayaran, items, total_harga)
 
     # Total and Checkout
-    total_cost_label = ctk.CTkLabel(app, text="RP 0,-", font=("Arial", 16, "bold"))
-    total_cost_label.grid(row=2, column=0, pady=10, padx=10, sticky="w")
+    total_cost_label = ctk.CTkLabel(main_frame, text=(f"Total Pesanan Rp {total_cost}"),text_color='#DB7575', font=("Arial", 16, "bold"))
+    total_cost_label.place(relx=0.14, rely=0.87 , anchor="nw")
 
-    checkout_button = ctk.CTkButton(app, text="Check Out", command=checkout, fg_color="#FFADA1")
-    checkout_button.grid(row=2, column=1, pady=10, padx=10, sticky="e")
+    checkout_button = ctk.CTkButton(main_frame, text="checkout",font=("Baskerville", 25, "bold"), command=checkout, fg_color="#ffe3de",text_color='#DB7575')
+    checkout_button.place(relx=0.87, rely=0.91, anchor="center")  # Center confirm button at bottom
 
     # Update the total cost initially
     update_total_cost()
@@ -130,7 +151,7 @@ def buat_pembayaran_page(app, products, pilihan):
 if __name__ == "__main__":
     app = ctk.CTk()
     app.title("Cakeshop - Pembayaran")
-    app.geometry("900x500")
+    app.geometry("1270x710")
     sample_products = [
         {'name': 'Choco Bun', 'quantity': 1, 'price': 11000},
         {'name': 'Korean Garlic Bread', 'quantity': 1, 'price': 20000},
