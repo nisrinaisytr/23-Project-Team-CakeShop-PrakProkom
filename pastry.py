@@ -124,7 +124,7 @@ def buat_pastry_page(app):
             product_card = ctk.CTkFrame(product_frame,fg_color='white')
             product_card.grid(row=row, column=column,  padx=25, pady=15)
             image = Image.open(product['image'])
-            image = image.resize((270, 270), Image.LANCZOS) ## Image.Resampling.LANCZOS
+            image = image.resize((270, 270), Image.LANCZOS) ## Image.Resampling.
             img = ImageTk.PhotoImage(image)
 
             img_label = ctk.CTkLabel(product_card, image=img, text="")

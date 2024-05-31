@@ -123,7 +123,7 @@ def buat_pembayaran_page(app, products, pilihan):
         if latest_data:
             nama_pengguna = latest_data[0].capitalize()  # Take name from CSV file and capitalize
             no_telp = latest_data[1]
-            jam_input = latest_data[3].strip()  # Take time from CSV file
+            jam_input = latest_data[3].strip()  # Take time from CSV 
         else:
             # Default if no data in CSV
             nama_pengguna = "Unknown User"
