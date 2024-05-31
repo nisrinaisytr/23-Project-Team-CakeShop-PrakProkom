@@ -3,8 +3,8 @@ from PIL import Image, ImageTk
 import os
 import subprocess
 
-def main():
-    global app, slider_label, image_index, slider_images
+def main(app):
+    global slider_label, image_index, slider_images
 
     image_index = 0
 
@@ -22,7 +22,6 @@ def main():
         app.destroy()
         subprocess.Popen(['python', 'register.py', 'signin'])
 
-    
     def delete_cart():
         try:
             os.remove('database/cart.csv')
@@ -30,55 +29,60 @@ def main():
             pass
         app.destroy()
 
-    app = ctk.CTk()
-    app.geometry("900x600")
-    app.title("23Bee Bakery")
-
-    # Bind the clear_cart function to the close event
     app.protocol("WM_DELETE_WINDOW", delete_cart)
-    # app.protocol("WM_DELETE_WINDOW", app.destroy)
 
     bg_color = "#FFEFE8"
     text_color = "#FF7A8A"
     button_color = "#FFADA1"
     menu_color = "#FFD9CC"
-    font_title = ("Arial", 30, "bold")
-    font_subtitle = ("Arial", 20, "bold")
-    font_text = ("Arial", 12)
+    font_title = ("Baskerville Old Face", 90, "bold")
+    font_subtitle = ("Baskerville", 20, "bold")
+    font_text = ("Baskerville", 13, "bold")
+    ourmenu=("Baskerville Old Face", 40, "bold")
 
     app.grid_rowconfigure(0, weight=1)
     app.grid_columnconfigure(0, weight=1)
 
     main_frame = ctk.CTkFrame(app, fg_color=bg_color)
-    main_frame.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
+    main_frame.grid(row=0, column=0, rowspan=6, columnspan=5, sticky="nsew", padx=35, pady=25)
+
+    img_pathbread = os.path.join('images', 'homepage.png')
+    imgbread = Image.open(img_pathbread)
+    imgbread = imgbread.resize((2050, 1095), Image.LANCZOS)
+    img1 = ImageTk.PhotoImage(imgbread)
+
+    bg_label = ctk.CTkLabel(app, image=img1)
+    bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+    bg_label.image = img1
+    bg_label.lower()
 
     image_folder = "images"
     image_files = ["bakery1.png", "bakery2.png", "bakery3.png"]
     image_paths = [os.path.join(image_folder, img) for img in image_files]
 
-    slider_images = [ImageTk.PhotoImage(Image.open(img_path).resize((400, 300))) for img_path in image_paths]
+    slider_images = [ImageTk.PhotoImage(Image.open(img_path).resize((600, 400))) for img_path in image_paths]
     image_index = 0
 
     slider_label = ctk.CTkLabel(main_frame, image=slider_images[image_index], text="")
-    slider_label.grid(row=0, column=0, columnspan=3, pady=10)
+    slider_label.place(relx=0.09, rely=0.07)
 
     prev_button = ctk.CTkButton(main_frame, text="<", width=30, command=prev_image, fg_color=button_color)
     next_button = ctk.CTkButton(main_frame, text=">", width=30, command=next_image, fg_color=button_color)
 
-    prev_button.place(x=100, y=100)
-    next_button.place(x=450, y=100)
+    prev_button.place(relx=0.073, rely=0.265, anchor='center')
+    next_button.place(relx=0.441, rely=0.265, anchor='center')
 
-    title_label = ctk.CTkLabel(main_frame, text="23Bee Bakery", font=font_title, text_color=text_color)
-    title_label.grid(row=1, column=0, columnspan=3, pady=10)
+    title_label = ctk.CTkLabel(main_frame, text="23Bee Bakery", justify="right", font=font_title, text_color=text_color)
+    title_label.place(relx=0.499, rely=0.1)
 
     description_label = ctk.CTkLabel(main_frame, text="Welcome to 23Bee Bakery! Enjoy our fresh breads, scrumptious cakes, fluffy donuts, and delectable pastries. Crafted with the finest ingredients, every treat is a sweet adventure. Stop by for a delightful bite today!",
-                                    wraplength=600, justify="center", text_color=text_color, font=font_text)
-    description_label.grid(row=2, column=0, columnspan=3, pady=10)
+                                    wraplength=600, justify="right", text_color=text_color, font=font_subtitle)
+    description_label.place(relx=0.492, rely=0.275)
 
     menu_image_paths = ["images/breads.png", "images/cakes.png", "images/donuts.png", "images/pastry.png"]
     menu_texts = ["BREADS", "CAKES", "DONUTS", "PASTRY"]
 
-    menu_images = [ImageTk.PhotoImage(Image.open(img_path).resize((150, 150))) for img_path in menu_image_paths]
+    menu_images = [ImageTk.PhotoImage(Image.open(img_path).resize((250, 250))) for img_path in menu_image_paths]
 
     import button
     menu_commands = [
@@ -88,25 +92,28 @@ def main():
         lambda: button.menuju_ke_pastry(app)
     ]
 
-    menu_label = ctk.CTkLabel(main_frame, text="OUR MENU", font=font_subtitle, text_color=text_color)
-    menu_label.grid(row=3, column=0, columnspan=4, pady=10)
+    menu_label = ctk.CTkLabel(main_frame, text="                                       OUR MENU                                     ", font=ourmenu, text_color='white', fg_color=button_color)
+    menu_label.place(relx=0.5, rely=0.54, anchor='center')
+
+    menu_frame = ctk.CTkFrame(main_frame, fg_color=bg_color)
+    menu_frame.place(relx=0.5, rely=0.78, anchor='center')
 
     for i, (img, text, command) in enumerate(zip(menu_images, menu_texts, menu_commands)):
-        frame = ctk.CTkFrame(main_frame)
-        frame.grid(row=4, column=i, padx=10, pady=10)
+        frame = ctk.CTkFrame(menu_frame,fg_color=bg_color )
+        frame.grid(row=0, column=i, padx=60, pady=25)
         
         img_label = ctk.CTkLabel(frame, image=img, text="")
         img_label.pack(pady=(0, 10))
 
-        btn = ctk.CTkButton(frame, text=text, text_color=text_color, fg_color=button_color, command=command)
-        btn.pack()
+        btn = ctk.CTkButton(frame, text=text, font=font_text,text_color='white', fg_color=button_color, command=command)
+        btn.pack(padx=(1,1))
 
     logout_button = ctk.CTkButton(app, text="Log Out", fg_color=button_color, command=logout)
-    logout_button.place(x=700, y=20)
-
-    app.mainloop()
+    logout_button.place(relx=0.95, rely=0.05, anchor='ne')
 
 if __name__ == "__main__":
-    #import Register
-    #Register.main('action')
-    main()
+    app = ctk.CTk()
+    app.geometry("1270x710")
+    app.title("23Bee Bakery")
+    main(app)
+    app.mainloop()

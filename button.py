@@ -19,7 +19,7 @@ def balik_ke_home(app):
     for widget in app.winfo_children():
         widget.destroy()
     import homepage
-    homepage.main()
+    homepage.main(app)
 
 def menuju_ke_register(app):
     for widget in app.winfo_childern():
