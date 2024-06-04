@@ -84,7 +84,7 @@ def buat_pembayaran_page(app, products, pilihan):
     header_frame.pack_propagate(False)  # Prevent frame from resizing to fit its content
 
     from button import balik_ke_home
-    back_button = ctk.CTkButton(app, text="Batal", command=lambda:balik_ke_home(app), fg_color="#FFADA1")
+    back_button = ctk.CTkButton(app, text="Batal", command=lambda:balik_ke_home(app), fg_color="#C27767", text_color='white')
     back_button.pack(side="top", padx=15, pady=30)
     back_button.place(rely=0.02,relx=0.01)
     #back_button.pack_propagate(False) 
@@ -142,7 +142,7 @@ def buat_pembayaran_page(app, products, pilihan):
     total_cost_label = ctk.CTkLabel(main_frame, text=(f"Total Pesanan Rp {total_cost}"),text_color='#DB7575', font=("Arial", 16, "bold"))
     total_cost_label.place(relx=0.14, rely=0.87 , anchor="nw")
 
-    checkout_button = ctk.CTkButton(main_frame, text="checkout",font=("Baskerville", 25, "bold"), command=checkout, fg_color="#ffe3de",text_color='#DB7575')
+    checkout_button = ctk.CTkButton(main_frame, text="checkout",font=("Baskerville", 25, "bold"), command=checkout, fg_color="#C27767", text_color='white')
     checkout_button.place(relx=0.87, rely=0.91, anchor="center")  # Center confirm button at bottom
 
     # Update the total cost initially

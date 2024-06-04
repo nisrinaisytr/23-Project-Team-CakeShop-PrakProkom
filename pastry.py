@@ -89,6 +89,21 @@ def buat_pastry_page(app):
         total_cost += product['price']
         update_display()
 
+    def proceed_to_selection(method, selected_products, app):
+        if not selected_products:
+            messagebox.showwarning("Peringatan", "Harap masukkan produk terlebih dahulu")
+        else:
+            save_cart_to_csv()
+            # Reset keranjang
+            #reset_cart()
+            button.menuju_ke_pemilihan(app, method, selected_products)
+
+    def reset_cart():
+        global selected_products, total_cost
+        selected_products = []
+        total_cost = 0
+        update_display()
+        save_cart_to_csv()
     # def go_back():
     #     save_cart_to_csv()  # Save cart to CSV before going back
     #     for widget in app.winfo_children():
@@ -96,7 +111,7 @@ def buat_pastry_page(app):
     #     os.system('python homepage.py')
 
     #def go_back():
-    save_cart_to_csv()  # Save cart to CSV before going back
+    #save_cart_to_csv()  # Save cart to CSV before going back
         #app.destroy()
         #os.system('python homepage.py')
 
@@ -164,13 +179,13 @@ def buat_pastry_page(app):
     action_frame = ctk.CTkFrame(bottom_frame, fg_color='#CB9B7B')
     action_frame.grid(row=0, columnspan=2,column=1, pady=5, padx=5)
 
-    takeaway_button = ctk.CTkButton(action_frame,width=240, text="TAKEAWAY", fg_color='white',text_color='#CB9B7B', command=lambda: button.menuju_ke_pemilihan(app, "TAKEAWAY", selected_products))
+    takeaway_button = ctk.CTkButton(action_frame,width=240, text="TAKEAWAY", fg_color='white',text_color='#CB9B7B', command=lambda: proceed_to_selection( "TAKEAWAY", selected_products, app))
     takeaway_button.grid(row=0, column=0, padx=10, pady=5)
-    delivery_button = ctk.CTkButton(action_frame,width=240, text="DELIVERY", fg_color='white',text_color='#CB9B7B', command=lambda: button.menuju_ke_pemilihan(app, "DELIVERY", selected_products))
+    delivery_button = ctk.CTkButton(action_frame,width=240, text="DELIVERY", fg_color='white',text_color='#CB9B7B', command=lambda: proceed_to_selection( "DELIVERY", selected_products, app))
     delivery_button.grid(row=0, column=1, padx=10, pady=5)
-    dinein_button = ctk.CTkButton(action_frame,width=240, text="DINE IN", fg_color='white',text_color='#CB9B7B', command=lambda: button.menuju_ke_pemilihan(app, "DINE IN", selected_products))
+    dinein_button = ctk.CTkButton(action_frame,width=240, text="DINE IN", fg_color='white',text_color='#CB9B7B', command=lambda: proceed_to_selection( "DINE IN", selected_products, app))
     dinein_button.grid(row=0, column=2, padx=10, pady=5)
-
+    reset_cart
      # Initialize selected_count_label and total_cost_label
     update_display()
 
